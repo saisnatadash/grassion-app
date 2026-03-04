@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grassion — Scanner Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    body { background: var(--bg2); }
+
+    /* ── APP LAYOUT ── */
+    .app-wrap {
+      padding-top: var(--nav-h);
+      min-height: 100vh;
+    }
+
+    .app-main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    @media (max-width: 768px) { .app-main { padding: 24px 16px 60px; } }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 15px;
+      color: var(--ink3);
+      font-weight: 300;
+    }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-section {
+      margin-bottom: 32px;
+    }
+
+    .upload-zone {
+      background: #fff;
+      border: 2px dashed var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 56px 40px;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--green);
+      background: var(--green-bg);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 0;
+    }
+
+    .upload-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .upload-zone h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .upload-zone p {
+      font-size: 14px;
+      color: var(--ink3);
+      font-weight: 300;
+    }
+
+    .upload-zone .upload-hint {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink4);
+      background: var(--bg2);
+      padding: 6px 14px;
+      border-radius: 6px;
+    }
+
+    /* Compare zone */
+    .compare-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--ink3);
+      cursor: pointer;
+      width: fit-content;
+    }
+
+    .compare-toggle input { width: auto; }
+
+    .compare-zone {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .compare-zone.show { display: block; }
+
+    /* ── DEMO BUTTON ── */
+    .demo-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .demo-bar p {
+      font-size: 13px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+    }
+
+    /* ── RESULTS ── */
+    #results { display: none; }
+    #results.show { display: block; }
+
+    /* Score card */
+    .score-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto auto auto;
+      gap: 16px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .score-bar { grid-template-columns: 1fr 1fr; }
+    }
+
+    .score-main {
+      text-align: center;
+      padding-right: 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    .score-num {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .score-num.red   { color: var(--red); }
+    .score-num.amber { color: var(--amber); }
+    .score-num.green { color: var(--green); }
+
+    .score-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink3);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .score-stat { text-align: center; }
+
+    .score-stat .num {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .score-stat .lbl {
+      font-size: 12px;
+      color: var(--ink3);
+      margin-top: 4px;
+    }
+
+    .score-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--bg3);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+      width: fit-content;
+    }
+
+    .tab {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--ink3);
+      transition: all 0.15s;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+    }
+
+    .tab.active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-count {
+      display: inline-block;
+      background: var(--bg3);
+      border-radius: 100px;
+      padding: 1px 7px;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+
+    .tab.active .tab-count { background: var(--bg2); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Variable table */
+    .var-table {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .var-table-header {
+      display: grid;
+      grid-template-columns: 280px 1fr 120px 80px;
+      padding: 12px 20px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink3);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .var-row {
+      display: grid;
+      grid-template-columns: 280px 1fr 120px 80px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--bg2);
+      align-items: start;
+      transition: background 0.12s;
+      cursor: default;
+    }
+
+    .var-row:last-child { border-bottom: none; }
+    .var-row:hover { background: var(--bg); }
+
+    .var-row.selected { background: var(--green-bg); }
+
+    .var-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .var-findings {
+      font-size: 13px;
+      color: var(--ink3);
+      font-weight: 300;
+    }
+
+    .finding-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 2px 4px 2px 0;
+      font-family: var(--font-mono);
+    }
+
+    .finding-chip.high   { background: var(--red-bg);   color: var(--red);   }
+    .finding-chip.medium { background: var(--amber-bg);  color: var(--amber); }
+    .finding-chip.low    { background: var(--bg3);       color: var(--ink3);  }
+    .finding-chip.info   { background: var(--green-bg);  color: var(--green); }
+
+    .var-line {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink4);
+    }
+
+    .var-risk {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .var-table-header, .var-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .summary-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .summary-card .s-num {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .summary-card .s-label {
+      font-size: 13px;
+      color: var(--ink3);
+      font-weight: 300;
+    }
+
+    .s-num.critical { color: var(--red);   }
+    .s-num.active   { color: var(--green); }
+    .s-num.dead     { color: var(--ink3);  }
+    .s-num.warn     { color: var(--amber); }
+
+    /* Drift panel */
+    .drift-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--bg2);
+    }
+
+    .drift-item:last-child { border-bottom: none; }
+
+    .drift-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .drift-badge.high   { background: var(--red-bg);   color: var(--red);   }
+    .drift-badge.medium { background: var(--amber-bg);  color: var(--amber); }
+
+    .drift-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .drift-label {
+      font-size: 13px;
+      color: var(--ink3);
+      font-weight: 300;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--ink4);
+    }
+
+    .empty-state .e-icon { font-size: 32px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; font-weight: 300; }
+
+    /* Services panel */
+    .service-group {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .service-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .service-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--green);
+    }
+
+    .service-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    .service-vars {
+      padding: 14px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .service-var-chip {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--bg2);
+      color: var(--ink2);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    /* Highlights panel */
+    .highlight-section {
+      margin-bottom: 24px;
+    }
+
+    .highlight-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Upload another */
+    .scan-again {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    /* Report download */
+    .report-preview {
+      background: var(--ink);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .report-preview h3 {
+      color: #fff;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .report-preview p {
+      color: rgba(255,255,255,0.45);
+      font-size: 14px;
+      font-weight: 300;
+    }
+
+    /* Loading state */
+    .scanning-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(250, 250, 248, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .scanning-overlay.show { display: flex; }
+
+    .scan-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border2);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .scan-progress {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink3);
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="dot-live"></span>
+      Grassion
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="btn btn-ghost" style="font-size:13px;">← Back to site</a>
+      <a href="index.html#signup" class="btn btn-primary" style="font-size:13px;padding:8px 18px;">Get Early Access</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ SCANNING OVERLAY ═══ -->
+<div class="scanning-overlay" id="scanningOverlay">
+  <div class="scan-spinner"></div>
+  <p class="scan-progress" id="scanProgress">Analyzing your variables...</p>
+</div>
+
+<!-- ═══ APP BODY ═══ -->
+<div class="app-wrap">
+  <div class="app-main">
+
+    <div class="page-header">
+      <p class="label label-green">// EnvGuard Scanner</p>
+      <h1>Config Intelligence Dashboard</h1>
+      <p>Upload your .env file. Everything runs in your browser — nothing is ever sent to our servers.</p>
+    </div>
+
+    <!-- ── UPLOAD SECTION ── -->
+    <div class="upload-section" id="uploadSection">
+
+      <div class="demo-bar">
+        <button class="btn btn-outline" onclick="loadDemo()">
+          ⚡ Load Demo Data
+        </button>
+        <p>No .env file? Try our demo to see a sample scan result.</p>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".env,.txt" onchange="handleFileUpload(event)">
+        <span class="upload-icon">📂</span>
+        <h2>Drop your .env file here</h2>
+        <p>Or click to browse · Supports .env, .env.local, .env.production, any .env variant</p>
+        <div class="upload-hint">
+          🔒 Runs entirely in your browser · Zero data transmitted
+        </div>
+      </div>
+
+      <!-- Compare mode -->
+      <label class="compare-toggle mt-16">
+        <input type="checkbox" id="compareToggle" onchange="toggleCompare()">
+        Compare two environments (staging vs production)
+      </label>
+
+      <div class="compare-zone" id="compareZone">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;">
+          <div>
+            <p class="label" style="margin-bottom:8px;">Staging .env</p>
+            <div class="upload-zone" style="padding:28px 20px;" id="uploadZone2">
+              <input type="file" id="fileInput2" accept=".env,.txt" onchange="handleFileUpload2(event)">
+              <p style="font-size:14px;color:var(--ink3);">📁 Drop staging .env</p>
+            </div>
+          </div>
+          <div>
+            <p class="label" style="margin-bottom:8px;">Production .env</p>
+            <div class="upload-zone" style="padding:28px 20px;" id="uploadZone3">
+              <input type="file" id="fileInput3" accept=".env,.txt" onchange="handleFileUpload3(event)">
+              <p style="font-size:14px;color:var(--ink3);">📁 Drop production .env</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary mt-16" onclick="runDriftScan()">Run Drift Detection →</button>
+      </div>
+    </div>
+
+    <!-- ── RESULTS ── -->
+    <div id="results">
+
+      <!-- Scan again -->
+      <div class="scan-again">
+        <button class="btn btn-outline" onclick="resetScanner()">← Scan another file</button>
+        <span class="mono text-muted" id="scanFilename" style="font-size:13px;"></span>
+      </div>
+
+      <!-- Score bar -->
+      <div class="score-bar" id="scoreBar">
+        <div class="score-main">
+          <div class="score-num" id="scoreNum">—</div>
+          <div class="score-label">Risk Score / 10</div>
+          <div class="mt-8" id="scoreTag"></div>
+        </div>
+        <div></div>
+        <div class="score-stat">
+          <div class="num text-red" id="statDead">0</div>
+          <div class="lbl">Dead</div>
+        </div>
+        <div class="score-stat">
+          <div class="num text-amber" id="statWarning">0</div>
+          <div class="lbl">Warnings</div>
+        </div>
+        <div class="score-stat">
+          <div class="num text-green" id="statTotal">0</div>
+          <div class="lbl">Total</div>
+        </div>
+        <div class="score-actions">
+          <button class="btn btn-primary" id="downloadBtn" onclick="downloadReport()">
+            ↓ Download Report
+          </button>
+          <a href="index.html#signup" class="btn btn-outline">Get Full Access</a>
+        </div>
+      </div>
+
+      <!-- Report teaser -->
+      <div class="report-preview">
+        <div>
+          <h3>Share this report with your manager</h3>
+          <p>Download the full HTML report and send it — no account needed. The findings speak for themselves.</p>
+        </div>
+        <button class="btn btn-primary" onclick="downloadReport()">Download Full Report →</button>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <!-- Tabs -->
+      <div class="tabs" id="tabsBar">
+        <button class="tab active" onclick="switchTab('all',this)">
+          All Variables <span class="tab-count" id="tabCountAll">0</span>
+        </button>
+        <button class="tab" onclick="switchTab('critical',this)">
+          Critical <span class="tab-count" id="tabCountCritical">0</span>
+        </button>
+        <button class="tab" onclick="switchTab('dead',this)">
+          Dead <span class="tab-count" id="tabCountDead">0</span>
+        </button>
+        <button class="tab" onclick="switchTab('warnings',this)">
+          Warnings <span class="tab-count" id="tabCountWarnings">0</span>
+        </button>
+        <button class="tab" onclick="switchTab('services',this)">
+          Services
+        </button>
+        <button class="tab" onclick="switchTab('drift',this)" id="driftTab" style="display:none;">
+          Drift <span class="tab-count" id="tabCountDrift">0</span>
+        </button>
+      </div>
+
+      <!-- Tab panels -->
+      <div class="tab-panel active" id="panel-all">
+        <div class="var-table" id="tableAll"></div>
+      </div>
+      <div class="tab-panel" id="panel-critical">
+        <div class="var-table" id="tableCritical"></div>
+      </div>
+      <div class="tab-panel" id="panel-dead">
+        <div class="highlight-section">
+          <p class="highlight-title">🗑️ Dead Variables — Safe to Remove</p>
+          <p style="font-size:14px;color:var(--ink3);margin-bottom:16px;font-weight:300;">These variables have naming patterns that suggest they are deprecated or legacy. Removing them reduces noise and config fear for your entire team.</p>
+        </div>
+        <div class="var-table" id="tableDead"></div>
+      </div>
+      <div class="tab-panel" id="panel-warnings">
+        <div class="var-table" id="tableWarnings"></div>
+      </div>
+      <div class="tab-panel" id="panel-services">
+        <div id="servicesPanel"></div>
+      </div>
+      <div class="tab-panel" id="panel-drift">
+        <div class="var-table" id="driftPanel"></div>
+      </div>
+
+    </div>
+    <!-- end results -->
+
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Grassion</div>
+      <p class="footer-note">© 2026 Grassion · Powered by EnvGuard · Your data never leaves your browser.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="scanner.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
