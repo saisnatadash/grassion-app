@@ -42,7 +42,7 @@ pool.connect()
 const initDB = async () => {
   try {
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS signups (
+      DROP TABLE IF NOT EXISTS signups (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
         name VARCHAR(255),
