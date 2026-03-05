@@ -38,6 +38,30 @@ pool.connect()
     console.warn('  Signups will be logged to console only.');
   });
 
+  // Auto-create tables on startup
+const initDB = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS signups (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        name VARCHAR(255),
+        company VARCHAR(255),
+        source VARCHAR(100) DEFAULT 'landing',
+        status VARCHAR(50) DEFAULT 'waitlist',
+        notes TEXT,
+        razorpay_payment_id VARCHAR(255),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    console.log('✅ Tables ready');
+  } catch (err) {
+    console.error('Table creation error:', err.message);
+  }
+};
+initDB();
+
 // ── MIDDLEWARE ─────────────────────────────────────────────────
 
 app.use(helmet({
