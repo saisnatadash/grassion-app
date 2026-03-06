@@ -42,7 +42,7 @@ pool.connect()
 const initDB = async () => {
   try {
     await pool.query(`
-      DROP TABLE IF EXISTS signups CASCADE; CREATE TABLE signups (
+      CREATE TABLE IF NOT EXISTS signups (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
         name VARCHAR(255),
@@ -55,6 +55,14 @@ const initDB = async () => {
         updated_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS name VARCHAR(255)`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS company VARCHAR(255)`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS source VARCHAR(100) DEFAULT 'landing'`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'waitlist'`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS notes TEXT`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS razorpay_payment_id VARCHAR(255)`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
+    await pool.query(`ALTER TABLE signups ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
     console.log('✅ Tables ready');
   } catch (err) {
     console.error('Table creation error:', err.message);
