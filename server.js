@@ -284,7 +284,7 @@ app.listen(PORT, () => {
   console.log(`  ─────────────────────────────────`);
   console.log(`  Running at: http://localhost:${PORT}`);
   console.log(`  Mode:       ${process.env.NODE_ENV || 'development'}`);
-  console.log(`  Database:   Database: ${DATABASE_URL ? DATABASE_URL.substring(0,30)+'...' : 'MISSING - NOT SET!'}
+  console.log(`  Database:   ${DATABASE_URL ? 'YES - configured' : 'MISSING - NOT SET!'}`);
   console.log('');
 });
 
