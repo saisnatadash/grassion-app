@@ -20,8 +20,11 @@ const PORT = process.env.PORT || 3001;
 
 // ── DATABASE ──────────────────────────────────────────────────
 
+const DATABASE_URL = process.env.DATABASE_URL;
+console.log('DATABASE_URL loaded:', DATABASE_URL ? 'YES' : 'NO - MISSING!');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
@@ -281,7 +284,7 @@ app.listen(PORT, () => {
   console.log(`  ─────────────────────────────────`);
   console.log(`  Running at: http://localhost:${PORT}`);
   console.log(`  Mode:       ${process.env.NODE_ENV || 'development'}`);
-  console.log(`  Database:   ${process.env.DATABASE_URL ? 'configured' : 'not configured (using console log fallback)'}`);
+  console.log(`  Database:   Database: ${DATABASE_URL ? DATABASE_URL.substring(0,30)+'...' : 'MISSING - NOT SET!'}
   console.log('');
 });
 
