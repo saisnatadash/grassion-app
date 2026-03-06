@@ -24,19 +24,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 })
-```
-
-**Remove any fallback localhost URL completely.**
-
-The `ssl` line is also critical — Railway Postgres requires SSL in production and without it the connection gets refused.
-
----
-
-**Also check** Railway → grassion-app → Variables → click **"Raw Editor"** → paste this and save:
-```
-NODE_ENV=production
-PORT=8080
-ALLOWED_ORIGINS=https://grassion.com
 
 // Test connection on start
 pool.connect()
