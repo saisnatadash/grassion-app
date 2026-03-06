@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3001;
 
 // ── DATABASE ──────────────────────────────────────────────────
 
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:jiDCzCSPPkvXBJgJNpVBzlPWWycsFHqa@turntable.proxy.rlwy.net:56814/railway';
 console.log('DATABASE_URL loaded:', DATABASE_URL ? 'YES' : 'NO - MISSING!');
 
 const pool = new Pool({
