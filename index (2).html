@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Grassion maps every environment variable in your codebase — what it does, what breaks if you touch it, and where staging silently stopped matching production.">
+  <title>Grassion — Know your config. Ship with confidence.</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    /* ── PAGE-SPECIFIC STYLES ── */
+
+    /* Grain texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding-top: calc(var(--nav-h) + 80px);
+      padding-bottom: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 780px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-bg);
+      border: 1px solid rgba(27, 94, 59, 0.2);
+      color: var(--green);
+      padding: 5px 14px 5px 10px;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 32px;
+      letter-spacing: 0.02em;
+      animation: fadeDown 0.5s ease both;
+    }
+
+    .hero h1 {
+      font-size: clamp(44px, 6.5vw, 76px);
+      font-weight: 700;
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      animation: fadeDown 0.5s ease 0.05s both;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--ink3);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--ink2);
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 44px;
+      animation: fadeDown 0.5s ease 0.1s both;
+      font-weight: 300;
+    }
+
+    /* email capture */
+    .hero-form {
+      display: flex;
+      gap: 10px;
+      max-width: 480px;
+      animation: fadeDown 0.5s ease 0.15s both;
+      margin-bottom: 16px;
+    }
+
+    .hero-form input {
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .hero-meta {
+      font-size: 13px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+      animation: fadeDown 0.5s ease 0.2s both;
+    }
+
+    .hero-meta span { color: var(--green); font-weight: 500; }
+
+    /* decorative right side */
+    .hero-bg-line {
+      position: absolute;
+      right: -80px;
+      top: 80px;
+      width: 520px;
+      height: 520px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .hero-bg-line2 {
+      position: absolute;
+      right: -160px;
+      top: 0px;
+      width: 680px;
+      height: 680px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Floating terminal preview */
+    .hero-terminal {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-45%);
+      width: 400px;
+      animation: fadeLeft 0.8s ease 0.3s both;
+    }
+
+    @media (max-width: 1020px) {
+      .hero-terminal { display: none; }
+      .hero-inner { max-width: 100%; }
+    }
+
+    @keyframes fadeLeft {
+      from { opacity: 0; transform: translateY(-45%) translateX(20px); }
+      to   { opacity: 1; transform: translateY(-45%) translateX(0); }
+    }
+
+    /* ── TERMINAL COMPONENT ── */
+    .terminal {
+      background: var(--ink);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.12);
+    }
+
+    .terminal-bar {
+      background: #2A2A28;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .t-dot {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+    }
+    .t-dot-r { background: #FF5F57; }
+    .t-dot-y { background: #FEBC2E; }
+    .t-dot-g { background: #28C840; }
+
+    .t-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #666;
+      margin-left: 6px;
+    }
+
+    .terminal-body {
+      padding: 20px 22px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.85;
+    }
+
+    .t-prompt  { color: #4A9E6B; }
+    .t-cmd     { color: #E2E8F0; }
+    .t-dim     { color: #444; }
+    .t-ok      { color: #4A9E6B; }
+    .t-warn    { color: #D97706; }
+    .t-err     { color: #E05252; }
+    .t-muted   { color: #555; }
+    .t-white   { color: #CBD5E1; }
+    .t-link    { color: #60A5FA; }
+
+    .t-cursor {
+      display: inline-block;
+      width: 7px; height: 13px;
+      background: #4A9E6B;
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SUCCESS STATE ── */
+    .signup-success {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 13px 18px;
+      background: var(--green-bg);
+      border: 1px solid rgba(27, 94, 59, 0.25);
+      border-radius: var(--radius);
+      max-width: 480px;
+    }
+
+    /* ── STATS ── */
+    .stats-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 0;
+      background: #fff;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 0 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--ink3);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .stat { border-right: none; }
+    }
+
+    /* ── SECTION COMMON ── */
+    .section { padding: 96px 0; }
+    .section-sm { padding: 64px 0; }
+
+    .section-header { margin-bottom: 56px; }
+
+    .section-header h2 {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-header p {
+      font-size: 17px;
+      color: var(--ink2);
+      max-width: 520px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── PROBLEM ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 680px) {
+      .problem-grid { grid-template-columns: 1fr; }
+    }
+
+    .problem-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      transition: border-color 0.2s;
+    }
+
+    .problem-card:hover { border-color: var(--border2); }
+
+    .problem-card .icon {
+      font-size: 22px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .problem-card p {
+      font-size: 14px;
+      color: var(--ink3);
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    /* ── QUOTE ── */
+    .quote-block {
+      background: var(--red-bg);
+      border: 1px solid rgba(192, 57, 43, 0.15);
+      border-left: 3px solid var(--red);
+      border-radius: var(--radius-lg);
+      padding: 36px 40px;
+      max-width: 780px;
+    }
+
+    .quote-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--red);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .quote-block blockquote {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .quote-who {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink3);
+    }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      position: relative;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(27, 94, 59, 0.3);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .feature-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink4);
+      letter-spacing: 0.06em;
+      margin-bottom: 20px;
+    }
+
+    .feature-icon {
+      width: 36px; height: 36px;
+      background: var(--green-bg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      font-size: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--ink3);
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    .steps::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      left: calc(100%/6 + 16px);
+      right: calc(100%/6 + 16px);
+      height: 1px;
+      background: var(--border2);
+    }
+
+    @media (max-width: 680px) {
+      .steps { grid-template-columns: 1fr; }
+      .steps::after { display: none; }
+    }
+
+    .step { padding: 0 24px; text-align: center; }
+
+    .step-circle {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border2);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--green);
+      position: relative;
+      z-index: 1;
+    }
+
+    .step h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--ink3);
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    /* ── WHO IT'S FOR ── */
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 680px) {
+      .persona-grid { grid-template-columns: 1fr; }
+    }
+
+    .persona-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+    }
+
+    .persona-card .persona-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink4);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .persona-card h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .persona-card p {
+      font-size: 15px;
+      color: var(--ink2);
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    .persona-role {
+      display: inline-block;
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--green);
+      background: var(--green-bg);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    /* ── ROADMAP ── */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    .roadmap-grid::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 8%;
+      right: 8%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .roadmap-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 36px;
+      }
+      .roadmap-grid::after { display: none; }
+    }
+
+    .roadmap-item { padding: 0 20px; }
+
+    .roadmap-dot {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+    }
+
+    .roadmap-dot.active {
+      background: var(--green-bg);
+      border: 1px solid rgba(27, 94, 59, 0.3);
+      color: var(--green);
+    }
+
+    .roadmap-dot.upcoming {
+      background: #fff;
+      border: 1px solid var(--border2);
+      color: var(--ink3);
+    }
+
+    .roadmap-dot.future {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--ink4);
+    }
+
+    .roadmap-phase {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--green);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .roadmap-item.dim .roadmap-phase { color: var(--ink4); }
+
+    .roadmap-item h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .roadmap-item p {
+      font-size: 13px;
+      color: var(--ink3);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    .price-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      position: relative;
+    }
+
+    .price-card.featured {
+      border-color: var(--green);
+      box-shadow: 0 0 0 1px var(--green);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 100px;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .price-tier {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink3);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .price-amount {
+      font-family: var(--font-display);
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .price-period {
+      font-size: 13px;
+      color: var(--ink4);
+      margin-bottom: 28px;
+    }
+
+    .price-features {
+      list-style: none;
+      margin-bottom: 28px;
+    }
+
+    .price-features li {
+      font-size: 14px;
+      color: var(--ink2);
+      padding: 9px 0;
+      border-bottom: 1px solid var(--bg2);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .price-features li::before {
+      content: '✓';
+      color: var(--green);
+      font-size: 12px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      font-weight: 600;
+    }
+
+    /* ── FINAL CTA ── */
+    .final-cta {
+      background: var(--ink);
+      border-radius: var(--radius-lg);
+      padding: 72px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse, rgba(27, 94, 59, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .final-cta h2 {
+      color: #fff;
+      font-size: clamp(28px, 4vw, 44px);
+      margin-bottom: 16px;
+    }
+
+    .final-cta p {
+      color: rgba(255,255,255,0.55);
+      font-size: 16px;
+      margin-bottom: 36px;
+      font-weight: 300;
+    }
+
+    .final-cta .hero-form {
+      margin: 0 auto 14px;
+      animation: none;
+    }
+
+    .final-cta input {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+
+    .final-cta input::placeholder { color: rgba(255,255,255,0.3); }
+    .final-cta input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(27, 94, 59, 0.3);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .final-cta .hero-meta { color: rgba(255,255,255,0.35); }
+    .final-cta .hero-meta span { color: rgba(27, 200, 100, 0.9); }
+
+    .final-cta .signup-success {
+      margin: 0 auto;
+      justify-content: center;
+      background: rgba(27, 94, 59, 0.2);
+      border-color: rgba(27, 94, 59, 0.4);
+    }
+
+    @media (max-width: 680px) {
+      .final-cta { padding: 48px 28px; }
+      .hero-form { flex-direction: column; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="dot-live"></span>
+      Grassion
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works" class="nav-link">How it works</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="app.html" class="btn btn-outline" style="margin-left:8px;font-size:13px;padding:8px 18px;">Try Demo</a>
+      <a href="#signup" class="btn btn-primary" style="margin-left:6px;font-size:13px;padding:8px 18px;">Early Access</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="container" style="position:relative;">
+    <div class="hero-bg-line"></div>
+    <div class="hero-bg-line2"></div>
+
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="dot-live"></span>
+        Powered by EnvGuard · Early Access Open
+      </div>
+
+      <h1>
+        Your config is<br>
+        a <em>minefield.</em><br>
+        We made the map.
+      </h1>
+
+      <p class="hero-sub">
+        Every engineering team above 15 people has the same problem — nobody knows which environment variables are alive, dead, or dangerous to touch. Grassion scans your codebase in 2 minutes and tells you exactly what each variable does and what breaks if you touch it.
+      </p>
+
+      <div id="signup">
+        <div class="hero-form" id="heroForm">
+          <input type="email" id="heroEmail" placeholder="you@company.com" autocomplete="email">
+          <button class="btn btn-primary btn-lg" onclick="submitSignup('heroEmail','heroSuccess','heroForm')">
+            Join Waitlist
+          </button>
+        </div>
+        <div class="signup-success" id="heroSuccess">
+          ✓ &nbsp; You're on the list. We'll reach out within 48 hours.
+        </div>
+        <p class="hero-meta mt-16">
+          Free early access · No credit card ·
+          <span id="countHero">47</span> engineers already signed up
+        </p>
+      </div>
+    </div>
+
+    <!-- Floating terminal -->
+    <div class="hero-terminal">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot t-dot-r"></div>
+          <div class="t-dot t-dot-y"></div>
+          <div class="t-dot t-dot-g"></div>
+          <span class="t-title">payment-service — grassion scan</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">$</span> <span class="t-cmd">grassion scan .</span></div>
+          <div class="t-dim">─────────────────────────</div>
+          <div><span class="t-muted">  Scanning 847 files...</span></div>
+          <div><span class="t-muted">  Found 134 env variables</span></div>
+          <br>
+          <div><span class="t-ok">  ✓ 23</span><span class="t-muted"> CRITICAL</span></div>
+          <div><span class="t-warn">  ● 67</span><span class="t-muted"> ACTIVE</span></div>
+          <div><span class="t-err">  ✗ 31</span><span class="t-muted"> DEAD — safe to remove</span></div>
+          <div><span class="t-err">  ⚠ 13</span><span class="t-muted"> DRIFT: prod ≠ staging</span></div>
+          <br>
+          <div><span class="t-err">  Risk: 7.4/10 HIGH</span></div>
+          <div class="t-dim">─────────────────────────</div>
+          <div><span class="t-ok">  Report saved</span> <span class="t-link">grassion-report.html</span><span class="t-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-num">₹40K</div>
+        <div class="stat-label">Average cost per<br>config incident</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3×</div>
+        <div class="stat-label">Config incidents<br>per team monthly</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">27%</div>
+        <div class="stat-label">Variables are dead<br>on average</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2 min</div>
+        <div class="stat-label">To run your<br>first scan</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROBLEM ═══ -->
+<section class="section reveal">
+  <div class="container">
+    <div class="section-header">
+      <p class="label label-green">// The Problem</p>
+      <h2>Config changes are the most<br>feared part of every deployment.</h2>
+      <p>Nobody has a clear map. So engineers hold their breath and hope.<br>Until something breaks at 2am.</p>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <span class="icon">😰</span>
+        <h3>Is this variable even used?</h3>
+        <p>40–200 env variables per codebase. Nobody knows which are dead. Nobody knows which break production. Every change is a gamble with production on the line.</p>
+      </div>
+      <div class="problem-card">
+        <span class="icon">🔥</span>
+        <h3>Why is prod behaving differently?</h3>
+        <p>Staging and production silently drift apart. The difference is invisible until the deployment hits and everything breaks at 2am on a Friday.</p>
+      </div>
+      <div class="problem-card">
+        <span class="icon">📞</span>
+        <h3>Who do I call at 2am?</h3>
+        <p>The engineer who knew why this variable exists left six months ago. The knowledge is gone. The incident is live. The clock is running.</p>
+      </div>
+      <div class="problem-card">
+        <span class="icon">🤖</span>
+        <h3>AI wrote this. What does it need?</h3>
+        <p>AI-generated code adds config without understanding what already exists. In 2026 this is making config chaos 10× worse, faster than teams can keep up.</p>
+      </div>
+    </div>
+
+    <!-- quote -->
+    <div class="mt-64">
+      <div class="quote-block reveal">
+        <p class="quote-label">// Real incident. Every team has one.</p>
+        <blockquote>"We removed PAYMENT_RETRY_LIMIT from staging — it looked unused. Friday 11pm, production broke. Three hours of tracing. It was used by one service that only activates under high-load payment retries. That incident cost us ₹3 lakh in engineer time and one missed SLA."</blockquote>
+        <p class="quote-who">— DevOps Lead, Series B fintech, Bangalore</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="section reveal" style="background:#fff; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <p class="label label-green">// What Grassion Does</p>
+      <h2>One scan. Complete clarity.</h2>
+      <p>Every feature answers the same question: <em>is it safe to touch this?</em></p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-num">01</div>
+        <div class="feature-icon">🗺️</div>
+        <h3>Complete Variable Map</h3>
+        <p>Scans JS, Python, Go, YAML, Dockerfiles, K8s manifests. Every variable. Every reference. Exact file and line number.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">02</div>
+        <div class="feature-icon">🔍</div>
+        <h3>Dead Variable Finder</h3>
+        <p>Flags variables that exist in config but have zero code references. The average team has 27% dead variables creating unnecessary fear.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">03</div>
+        <div class="feature-icon">⚡</div>
+        <h3>Drift Detection</h3>
+        <p>Compares staging and production variable by variable. Flags every divergence before you deploy — not after you break prod at 2am.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">04</div>
+        <div class="feature-icon">🎯</div>
+        <h3>Pre-Deploy Risk Score</h3>
+        <p>Before any deployment, get a 1–10 risk score with exact reasons — services affected, critical paths, and last incident history.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">05</div>
+        <div class="feature-icon">📜</div>
+        <h3>Git History Integration</h3>
+        <p>Every variable shows who added it, when, in which PR. When someone asks "why does this exist?" — Grassion answers in 5 seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">06</div>
+        <div class="feature-icon">🔔</div>
+        <h3>PR + Slack Integration</h3>
+        <p>Any PR that changes config gets an automatic risk summary. The whole team sees the risk before merging, not after it ships.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="section reveal" id="how-it-works">
+  <div class="container">
+    <div class="section-header text-center" style="margin-left:auto;margin-right:auto;">
+      <p class="label label-green">// How It Works</p>
+      <h2>From zero to clarity in 3 steps.</h2>
+      <p style="margin:0 auto;">No account needed for the first scan. No data leaves your machine. No setup call required.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-circle">01</div>
+        <h3>Upload your .env</h3>
+        <p>Drop your .env file into the Grassion dashboard. Runs entirely in your browser. Nothing is ever sent to our servers.</p>
+      </div>
+      <div class="step">
+        <div class="step-circle">02</div>
+        <h3>Instant analysis</h3>
+        <p>Grassion analyzes every variable — patterns, naming, risk signals, duplicates, and potential secrets in wrong places.</p>
+      </div>
+      <div class="step">
+        <div class="step-circle">03</div>
+        <h3>Share the report</h3>
+        <p>Get a clean, shareable report. Send it to your manager. Watch their face when they see what was hiding in your config.</p>
+      </div>
+    </div>
+
+    <div class="text-center mt-48">
+      <a href="app.html" class="btn btn-primary btn-lg">Try the Demo — Free →</a>
+      <p class="mt-16 text-muted" style="font-size:13px;font-family:var(--font-mono);">No signup required for demo</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WHO IT'S FOR ═══ -->
+<section class="section reveal" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <p class="label label-green">// Who Uses Grassion</p>
+      <h2>Built for the people<br>who get paged at 2am.</h2>
+    </div>
+
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-tag">The User</div>
+        <h3>DevOps Engineer</h3>
+        <p>You manage deployments, CI/CD, and infrastructure. You get paged when config breaks. You've felt the specific terror of touching something and not knowing what it's connected to. Grassion is your terminal power tool. One scan. Instant clarity. You share the report. Your manager approves it.</p>
+        <span class="persona-role">→ Runs the tool</span>
+      </div>
+      <div class="persona-card">
+        <div class="persona-tag">The Buyer</div>
+        <h3>Engineering Manager</h3>
+        <p>You're measured on delivery speed and production stability. You see the Grassion report your DevOps engineer shares and immediately understand the business risk it's exposing. You approve ₹8,000/month without a second meeting because one prevented incident pays for six months.</p>
+        <span class="persona-role" style="background:rgba(37,99,235,0.08);color:#1D4ED8;">→ Approves the budget</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ROADMAP ═══ -->
+<section class="section reveal">
+  <div class="container">
+    <div class="section-header">
+      <p class="label label-green">// Roadmap</p>
+      <h2>Built for today.<br>Designed for tomorrow.</h2>
+      <p>We start focused. We expand based on what you actually need.</p>
+    </div>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-item">
+        <div class="roadmap-dot active">Q1</div>
+        <div class="roadmap-phase">Now</div>
+        <h4>Scanner MVP</h4>
+        <p>Variable map, dead detection, drift comparison, risk scoring. Free forever.</p>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot upcoming">Q2</div>
+        <div class="roadmap-phase" style="color:var(--ink3)">Next</div>
+        <h4>Automation</h4>
+        <p>Slack alerts, GitHub PR integration, AWS/GCP cloud env direct connection.</p>
+      </div>
+      <div class="roadmap-item dim">
+        <div class="roadmap-dot future">Q3</div>
+        <div class="roadmap-phase">Building</div>
+        <h4>Compliance</h4>
+        <p>SOC2 audit trails, change approval workflows, ISO27001 reporting.</p>
+      </div>
+      <div class="roadmap-item dim">
+        <div class="roadmap-dot future">Q4+</div>
+        <div class="roadmap-phase">Vision</div>
+        <h4>Intelligence</h4>
+        <p>AI-powered config review, cross-org pattern detection, benchmarks by stack.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRICING ═══ -->
+<section class="section reveal" id="pricing" style="background:#fff; border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header text-center" style="margin:0 auto 56px;">
+      <p class="label label-green">// Pricing</p>
+      <h2>Simple. Transparent.<br>Worth every rupee.</h2>
+      <p style="margin:0 auto;">One prevented incident pays for six months of Grassion.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="price-card">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">₹0</div>
+        <div class="price-period">forever — no account needed</div>
+        <ul class="price-features">
+          <li>Browser-based .env scanner</li>
+          <li>Variable map + dead detection</li>
+          <li>Manual drift comparison</li>
+          <li>Risk scoring</li>
+          <li>Downloadable HTML report</li>
+        </ul>
+        <a href="app.html" class="btn btn-outline" style="width:100%;justify-content:center;">Try Demo Now →</a>
+      </div>
+
+      <!-- Team -->
+      <div class="price-card featured">
+        <div class="featured-badge">Most Popular</div>
+        <div class="price-tier">Team</div>
+        <div class="price-amount">₹8,000</div>
+        <div class="price-period">per team / month</div>
+        <ul class="price-features">
+          <li>Everything in Free</li>
+          <li>Slack drift alerts</li>
+          <li>GitHub PR auto-comments</li>
+          <li>AWS / GCP cloud env sync</li>
+          <li>Pre-deploy risk scores</li>
+          <li>Team dashboard</li>
+        </ul>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="document.getElementById('heroEmail').focus();window.scrollTo({top:0,behavior:'smooth'})">Get Early Access →</button>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="price-card">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-amount">Custom</div>
+        <div class="price-period">for teams 100+ engineers</div>
+        <ul class="price-features">
+          <li>Everything in Team</li>
+          <li>SOC2 + ISO27001 reports</li>
+          <li>Change approval workflows</li>
+          <li>SSO + RBAC</li>
+          <li>SLA + dedicated support</li>
+          <li>On-premise option</li>
+        </ul>
+        <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="document.getElementById('heroEmail').focus();window.scrollTo({top:0,behavior:'smooth'})">Talk to Us →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINAL CTA ═══ -->
+<section class="section-sm reveal">
+  <div class="container">
+    <div class="final-cta">
+      <h2>Stop holding your breath<br>on every deploy.</h2>
+      <p>Join 47 engineering teams getting early access.<br>Free scan. No account. No risk.</p>
+
+      <div class="hero-form" id="ctaForm" style="justify-content:center;">
+        <input type="email" id="ctaEmail" placeholder="you@company.com" autocomplete="email">
+        <button class="btn btn-primary btn-lg" onclick="submitSignup('ctaEmail','ctaSuccess','ctaForm')">
+          Join Waitlist →
+        </button>
+      </div>
+      <div class="signup-success" id="ctaSuccess"></div>
+      <p class="hero-meta" style="margin-top:14px;">
+        Free early access · Ships Q1 2026 ·
+        <span id="countCta">47</span> engineers signed up
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">Grassion</div>
+        <p style="font-size:13px;color:var(--ink4);margin-top:4px;">Powered by EnvGuard</p>
+      </div>
+      <p class="footer-note">© 2026 Grassion · Built for engineers who deserve better tools.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── NAV COMPACT ON SCROLL ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').style.borderBottomColor =
+      window.scrollY > 40 ? 'var(--border2)' : 'var(--border)';
+  });
+
+  // ── SIGNUP ──
+  const BASE_COUNT = 47;
+
+  function getSignups() {
+    try { return JSON.parse(localStorage.getItem('grassion_signups') || '[]'); } catch { return []; }
+  }
+
+  function updateCounters() {
+    const n = BASE_COUNT + getSignups().length;
+    document.querySelectorAll('[id^="count"]').forEach(el => el.textContent = n);
+  }
+
+  function submitSignup(inputId, successId, formId) {
+    const email = document.getElementById(inputId).value.trim();
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!re.test(email)) {
+      const inp = document.getElementById(inputId);
+      inp.style.borderColor = 'var(--red)';
+      inp.style.boxShadow = '0 0 0 3px rgba(192,57,43,0.12)';
+      setTimeout(() => { inp.style.borderColor = ''; inp.style.boxShadow = ''; }, 2000);
+      return;
+    }
+
+    // Save email
+    fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    }).catch(() => {}); // graceful fail if backend not running
+
+    const signups = getSignups();
+    if (!signups.includes(email)) {
+      signups.push(email);
+      localStorage.setItem('grassion_signups', JSON.stringify(signups));
+    }
+
+    document.getElementById(formId).classList.add('hidden');
+    const s = document.getElementById(successId);
+    s.textContent = `✓  You're on the list — ${email}. We'll be in touch within 48 hours.`;
+    s.style.display = 'flex';
+    updateCounters();
+  }
+
+  // Enter key
+  ['heroEmail','ctaEmail'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const map = { heroEmail: ['heroEmail','heroSuccess','heroForm'], ctaEmail: ['ctaEmail','ctaSuccess','ctaForm'] };
+        submitSignup(...map[id]);
+      }
+    });
+  });
+
+  updateCounters();
+</script>
+</body>
+</html>
