@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Grassion</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root { --brand:#22bac4; --brand2:#2a2e6e; --brand-bg:rgba(34,186,196,0.08); }
+    body { background: var(--bg2); }
+
+    /* blobs */
+    .g-blob { position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);opacity:0.04;animation:blobDrift 20s ease-in-out infinite; }
+    .g-blob-1 { width:500px;height:500px;background:#22bac4;top:-100px;right:-60px; }
+    .g-blob-2 { width:400px;height:400px;background:#2a2e6e;bottom:0;left:-80px;animation-delay:-9s; }
+    @keyframes blobDrift { 0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(16px,-20px) scale(1.03)} }
+
+    /* reveal */
+    .reveal { opacity:0;transform:translateY(24px);transition:opacity 0.5s ease,transform 0.5s ease; }
+    .reveal.visible { opacity:1;transform:translateY(0); }
+
+    .about-wrap { padding-top: calc(var(--nav-h) + 60px); min-height:100vh; position:relative;z-index:1; }
+    .about-main { max-width: 820px; margin: 0 auto; padding: 0 32px 100px; }
+
+    .about-hero { margin-bottom: 64px; }
+    .about-hero h1 { font-size:48px;font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:var(--ink);margin-bottom:20px; }
+    .about-hero h1 span { color:var(--brand); }
+    .about-hero p { font-size:18px;color:var(--ink2);font-weight:300;line-height:1.7;max-width:600px; }
+
+    .divider { width:48px;height:3px;background:var(--brand);border-radius:2px;margin:40px 0; }
+
+    .about-section { margin-bottom:56px; }
+    .about-section h2 { font-size:22px;font-weight:700;color:var(--ink);margin-bottom:14px; }
+    .about-section p { font-size:16px;color:var(--ink2);line-height:1.8;font-weight:300; }
+
+    .founder-card {
+      display:flex;gap:28px;align-items:flex-start;
+      background:#fff;border:1px solid var(--border);border-radius:16px;
+      padding:28px;margin-top:12px;
+      transition:box-shadow 0.25s,transform 0.25s;
+    }
+    .founder-card:hover { box-shadow:0 8px 32px rgba(34,186,196,0.1);transform:translateY(-2px); }
+    .founder-avatar {
+      width:64px;height:64px;border-radius:50%;background:var(--brand-bg);
+      border:2px solid var(--brand);display:flex;align-items:center;justify-content:center;
+      font-size:26px;flex-shrink:0;
+    }
+    .founder-name { font-size:17px;font-weight:700;color:var(--ink);margin-bottom:4px; }
+    .founder-role { font-size:13px;color:var(--brand);font-weight:500;margin-bottom:10px; }
+    .founder-bio { font-size:14px;color:var(--ink2);line-height:1.7;font-weight:300; }
+
+    .value-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px; }
+    @media(max-width:600px){ .value-grid{grid-template-columns:1fr;} }
+    .value-card {
+      background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;
+      transition:box-shadow 0.25s,transform 0.25s;
+    }
+    .value-card:hover { box-shadow:0 6px 24px rgba(42,46,110,0.08);transform:translateY(-2px); }
+    .value-icon { font-size:22px;margin-bottom:10px; }
+    .value-title { font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px; }
+    .value-desc { font-size:13px;color:var(--ink2);line-height:1.6;font-weight:300; }
+
+    .stat-row { display:flex;gap:32px;flex-wrap:wrap;margin-top:16px; }
+    .stat-item { }
+    .stat-num { font-size:36px;font-weight:800;color:var(--brand);letter-spacing:-0.03em; }
+    .stat-label { font-size:13px;color:var(--ink3);margin-top:2px; }
+
+    .cta-strip {
+      background:var(--brand2);border-radius:16px;padding:36px 32px;
+      color:#fff;margin-top:56px;
+      transition:box-shadow 0.25s;
+    }
+    .cta-strip:hover { box-shadow:0 12px 40px rgba(42,46,110,0.2); }
+    .cta-strip h3 { font-size:22px;font-weight:700;margin-bottom:8px; }
+    .cta-strip p { font-size:15px;opacity:0.7;margin-bottom:20px;font-weight:300; }
+    .cta-strip a {
+      display:inline-block;background:var(--brand);color:#fff;
+      padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;
+      text-decoration:none;transition:opacity 0.2s,transform 0.2s;
+    }
+    .cta-strip a:hover { opacity:0.9;transform:translateY(-1px); }
+  </style>
+</head>
+<body>
+
+<div class="g-blob g-blob-1"></div>
+<div class="g-blob g-blob-2"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Grassion" style="height:26px;width:auto;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'">
+      <span class="dot-live"></span>Grassion
+    </a>
+    <div class="nav-links" style="display:flex;align-items:center;gap:12px;">
+      <a href="about.html" class="btn btn-ghost" style="font-size:13px;color:var(--brand);">About</a>
+      <a href="contact.html" class="btn btn-ghost" style="font-size:13px;">Work with us</a>
+      <a href="app.html" class="btn btn-primary" style="font-size:13px;padding:8px 18px;">Try Scanner →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="about-wrap">
+  <div class="about-main">
+
+    <div class="about-hero reveal">
+      <h1>We're building the<br><span>security layer</span><br>developers actually use.</h1>
+      <p>Grassion started with one observation: developers write .env files every day, and almost none of them have a fast, frictionless way to know if those files are dangerous. We're fixing that.</p>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <div class="about-section reveal">
+      <h2>The problem we're obsessed with</h2>
+      <p>547,000+ GitHub repositories have exposed API keys right now. Not because developers are careless — but because the tools that should catch these issues are either too expensive, too complex, or built for enterprise security teams, not the people actually writing code.</p>
+      <p style="margin-top:14px;">Grassion is built for the developer who's about to push to production at 11pm and needs to know — in 30 seconds — whether their config is safe. No account. No setup. Just drag, drop, and know.</p>
+    </div>
+
+    <div class="stat-row reveal">
+      <div class="stat-item">
+        <div class="stat-num">30s</div>
+        <div class="stat-label">Average scan time</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">40+</div>
+        <div class="stat-label">Risk patterns detected</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Bytes sent to our servers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">₹16Cr</div>
+        <div class="stat-label">Average breach cost we help prevent</div>
+      </div>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <div class="about-section reveal">
+      <h2>Our values</h2>
+      <div class="value-grid">
+        <div class="value-card">
+          <div class="value-icon">🔒</div>
+          <div class="value-title">Privacy by architecture</div>
+          <div class="value-desc">We built the scanner to run entirely in your browser. We can't see your secrets — not because of a policy, but because of how the code works.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">⚡</div>
+          <div class="value-title">Zero friction</div>
+          <div class="value-desc">If a security tool takes more than 60 seconds to start using, developers won't use it. Every feature we build is measured against that standard.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🇮🇳</div>
+          <div class="value-title">India-first</div>
+          <div class="value-desc">Under DPDP Act 2023, Indian companies face up to ₹250Cr in fines for data breaches. We're building the compliance layer India's developers actually need.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🧠</div>
+          <div class="value-title">AI that earns trust</div>
+          <div class="value-desc">Our AI gets smarter from every scan rating you give it. No black box — you tell us when we're wrong, and we fix it. Accuracy is our only metric.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-section reveal">
+      <h2>The team</h2>
+      <div class="founder-card">
+        <div class="founder-avatar">👨‍💻</div>
+        <div>
+          <div class="founder-name">Sai Snata Dash</div>
+          <div class="founder-role">Founder & CEO</div>
+          <div class="founder-bio">Built Grassion from scratch — the scanner engine, the paywall, the analytics, the AI risk scoring, and this page. Obsessed with developer tools that actually get used. Previously [your background here]. Based in Bhubaneswar, India.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-strip reveal">
+      <h3>Want to work with us?</h3>
+      <p>We're looking for engineers, security researchers, and partners who care about making Indian developer infrastructure safer.</p>
+      <a href="contact.html">Get in touch →</a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Grassion</div>
+      <p class="footer-note">© 2026 Grassion · Your data never leaves your browser.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);} });
+  },{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
