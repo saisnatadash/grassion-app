@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About &mdash; Grassion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.page-wrap { padding-top: calc(var(--nav-h) + 56px); }
+.page-main { max-width: 820px; margin: 0 auto; padding: 0 32px 100px; }
+.hero-h1 { font-family:'Syne',sans-serif; font-size:clamp(34px,5vw,54px); font-weight:800; letter-spacing:-.04em; line-height:1.08; color:var(--ink); margin-bottom:18px; }
+.hero-h1 span { color:var(--navy); }
+.hero-p { font-size:18px; color:var(--ink3); line-height:1.7; max-width:580px; }
+.divider { width:44px; height:3px; background:var(--navy); border-radius:2px; margin:36px 0; }
+.sec-h2 { font-family:'Syne',sans-serif; font-size:21px; font-weight:700; color:var(--ink); margin-bottom:12px; }
+.sec-p { font-size:15px; color:var(--ink3); line-height:1.8; }
+.stat-row { display:flex; gap:36px; flex-wrap:wrap; margin-top:14px; }
+.sn { font-family:'Syne',sans-serif; font-size:34px; font-weight:800; color:var(--navy); letter-spacing:-.03em; }
+.sl { font-size:12px; color:var(--ink3); margin-top:2px; }
+.value-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+@media(max-width:600px){.value-grid{grid-template-columns:1fr;}}
+.vcard { background:#fff; border:1px solid var(--border); border-radius:12px; padding:20px; transition:box-shadow .25s, transform .3s cubic-bezier(.25,.8,.25,1), border-color .2s; }
+.vcard:hover { box-shadow:0 8px 28px rgba(42,46,110,.09); transform:translateY(-3px); border-color:rgba(42,46,110,.18); }
+.vcard-icon { font-size:20px; margin-bottom:8px; }
+.vcard-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--ink); margin-bottom:5px; }
+.vcard-desc { font-size:13px; color:var(--ink3); line-height:1.6; }
+.founder-card { display:flex; gap:22px; align-items:flex-start; background:#fff; border:1px solid var(--border); border-radius:13px; padding:26px; margin-top:12px; transition:box-shadow .25s, transform .3s cubic-bezier(.25,.8,.25,1); }
+.founder-card:hover { box-shadow:0 10px 32px rgba(42,46,110,.09); transform:translateY(-3px); }
+.f-avatar { width:56px; height:56px; border-radius:50%; background:rgba(42,46,110,.07); border:2px solid var(--navy); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.f-name { font-size:16px; font-weight:700; color:var(--ink); margin-bottom:3px; }
+.f-role { font-size:12px; color:var(--teal); font-weight:600; margin-bottom:8px; }
+.f-bio { font-size:14px; color:var(--ink3); line-height:1.7; }
+.cta-strip { background:var(--navy); border-radius:14px; padding:32px 28px; color:#fff; margin-top:52px; transition:box-shadow .25s; }
+.cta-strip:hover { box-shadow:0 12px 40px rgba(42,46,110,.22); }
+.cta-strip h3 { font-family:'Syne',sans-serif; font-size:21px; font-weight:700; margin-bottom:7px; }
+.cta-strip p { font-size:14px; opacity:.7; margin-bottom:18px; }
+.cta-strip a { display:inline-block; background:var(--teal); color:#fff; padding:11px 26px; border-radius:8px; font-size:14px; font-weight:600; transition:opacity .2s, transform .2s; }
+.cta-strip a:hover { opacity:.9; transform:translateY(-2px); }
+@media(max-width:768px){.page-main{padding:0 20px 80px;}}
+
+/* ── SCROLL REVEAL ── */
+.reveal { opacity:0; transform:translateY(28px); transition:opacity 0.65s cubic-bezier(.22,1,.36,1), transform 0.65s cubic-bezier(.22,1,.36,1); }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-left { opacity:0; transform:translateX(-28px); transition:opacity 0.65s cubic-bezier(.22,1,.36,1), transform 0.65s cubic-bezier(.22,1,.36,1); }
+.reveal-left.visible { opacity:1; transform:translateX(0); }
+.reveal-right { opacity:0; transform:translateX(28px); transition:opacity 0.65s cubic-bezier(.22,1,.36,1), transform 0.65s cubic-bezier(.22,1,.36,1); }
+.reveal-right.visible { opacity:1; transform:translateX(0); }
+
+/* ── COLLABORATE / WORK WITH US SECTIONS ── */
+.collab-section { margin-bottom: 52px; }
+.collab-section .sec-h2 { margin-bottom: 6px; }
+.collab-form { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: box-shadow 0.3s, transform 0.3s cubic-bezier(.25,.8,.25,1); margin-top: 16px; }
+.collab-form:hover { box-shadow: 0 12px 36px rgba(42,46,110,0.08); transform: translateY(-2px); }
+.cf-row { margin-bottom: 14px; }
+.cf-label { display: block; font-size: 11px; font-weight: 700; color: var(--ink3); margin-bottom: 5px; letter-spacing: 0.06em; text-transform: uppercase; }
+.cf-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font-body); color: var(--ink); background: #fff; box-sizing: border-box; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.cf-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(42,46,110,0.08); }
+textarea.cf-input { min-height: 88px; resize: vertical; }
+.cf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media(max-width:600px){ .cf-grid { grid-template-columns: 1fr; } }
+.cf-btn { padding: 11px 24px; background: var(--navy); color: #fff; border: none; border-radius: 8px; font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 3px 10px rgba(42,46,110,0.2); transition: transform 0.25s cubic-bezier(.25,.8,.25,1), box-shadow 0.25s, background 0.2s; }
+.cf-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(42,46,110,0.3); background: #363b8a; }
+.cf-ok { display: none; color: var(--teal); font-size: 14px; font-weight: 600; margin-top: 10px; }
+
+/* Role cards */
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+@media(max-width:600px){ .role-grid { grid-template-columns: 1fr; } }
+.role-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px;
+  transition: box-shadow 0.25s, transform 0.3s cubic-bezier(.25,.8,.25,1), border-color 0.2s;
+}
+.role-card:hover { box-shadow: 0 8px 28px rgba(42,46,110,0.09); transform: translateY(-4px); border-color: rgba(42,46,110,0.2); }
+.role-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.role-type { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 100px; margin-bottom: 8px; }
+.role-type.eng { background: rgba(42,46,110,0.08); color: var(--navy); }
+.role-type.design { background: rgba(34,186,196,0.1); color: #0e7490; }
+.role-type.biz { background: rgba(245,158,11,0.1); color: #b45309; }
+.role-desc { font-size: 13px; color: var(--ink3); line-height: 1.6; }
+
+/* Contact email band */
+.contact-band { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-top: 48px; transition: box-shadow 0.3s, transform 0.3s cubic-bezier(.25,.8,.25,1); }
+.contact-band:hover { box-shadow: 0 10px 32px rgba(42,46,110,0.08); transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Grassion" onerror="this.style.display='none'">
+      <span>Grassion</span>
+      <span class="dot-live"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="about.html#work">Work with us</a></li>
+      <li><a href="app.html" class="btn-nav-primary">Try Scanner &rarr;</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-main">
+
+    <div class="reveal" style="margin-bottom:56px">
+      <div class="section-label">About Grassion</div>
+      <h1 class="hero-h1">We&rsquo;re building the<br><span>security layer</span><br>developers actually use.</h1>
+      <p class="hero-p">Grassion started with one observation: developers write .env files every day, and almost none of them have a fast, frictionless way to know if those files are dangerous. We&rsquo;re fixing that.</p>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <div class="reveal" style="margin-bottom:44px">
+      <h2 class="sec-h2">The problem we&rsquo;re obsessed with</h2>
+      <p class="sec-p">547,000+ GitHub repositories have exposed API keys right now. Not because developers are careless &mdash; but because the tools that should catch these issues are either too expensive, too complex, or built for enterprise security teams, not the people actually writing code.</p>
+      <p class="sec-p" style="margin-top:12px">Grassion is built for the developer who&rsquo;s about to push to production at 11pm and needs to know in 30 seconds whether their config is safe. No account. No setup. Just drag, drop, and know.</p>
+    </div>
+
+    <div class="stat-row reveal">
+      <div><div class="sn">30s</div><div class="sl">Average scan time</div></div>
+      <div><div class="sn">40+</div><div class="sl">Risk patterns detected</div></div>
+      <div><div class="sn">0</div><div class="sl">Bytes sent to our servers</div></div>
+      <div><div class="sn">&#8377;16Cr</div><div class="sl">Avg. breach cost we help prevent</div></div>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <div class="reveal" style="margin-bottom:44px">
+      <h2 class="sec-h2">Our values</h2>
+      <div class="value-grid">
+        <div class="vcard"><div class="vcard-icon">&#128274;</div><div class="vcard-title">Privacy by architecture</div><div class="vcard-desc">The scanner runs entirely in your browser. We can&rsquo;t see your secrets &mdash; not because of a policy, but because of how the code works.</div></div>
+        <div class="vcard"><div class="vcard-icon">&#9889;</div><div class="vcard-title">Zero friction</div><div class="vcard-desc">If a security tool takes more than 60 seconds to start using, developers won&rsquo;t use it. Every feature is measured against that standard.</div></div>
+        <div class="vcard"><div class="vcard-icon">&#127470;&#127475;</div><div class="vcard-title">India-first</div><div class="vcard-desc">Under DPDP Act 2023, Indian companies face up to &#8377;250Cr in fines for data breaches. We&rsquo;re building the compliance layer India needs.</div></div>
+        <div class="vcard"><div class="vcard-icon">&#129504;</div><div class="vcard-title">AI that earns trust</div><div class="vcard-desc">Our AI gets smarter from every scan rating. You tell us when we&rsquo;re wrong and we fix it. Accuracy is our only metric.</div></div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-bottom:44px">
+      <h2 class="sec-h2">The team</h2>
+      <div class="founder-card">
+        <div class="f-avatar">&#128104;&#8205;&#128187;</div>
+        <div>
+          <div class="f-name">Sai Snata Dash</div>
+          <div class="f-role">Founder &amp; CEO</div>
+          <div class="f-bio">Built Grassion from scratch &mdash; the scanner engine, payment integration, AI risk scoring, and everything in between. Obsessed with developer tools that actually get used. Based in Bhubaneswar, India.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <!-- COLLABORATE WITH US -->
+    <div class="collab-section reveal" id="collaborate">
+      <div class="section-label">Collaborate with us</div>
+      <h2 class="sec-h2">Partner, integrate, co-build.</h2>
+      <p class="sec-p" style="margin-bottom:4px;">If you&rsquo;re building developer tools, working in security research, or want to integrate Grassion into your product — we&rsquo;d love to talk. Early partners get lifetime pricing and direct engineering support.</p>
+      <div class="collab-form">
+        <div class="cf-grid">
+          <div class="cf-row"><label class="cf-label">Your name</label><input type="text" class="cf-input" id="collabName" placeholder="Priya Nair"></div>
+          <div class="cf-row"><label class="cf-label">Email</label><input type="email" class="cf-input" id="collabEmail" placeholder="priya@company.com"></div>
+        </div>
+        <div class="cf-row"><label class="cf-label">Company / Project</label><input type="text" class="cf-input" id="collabCompany" placeholder="Your company or project name"></div>
+        <div class="cf-row"><label class="cf-label">How would you like to collaborate?</label><textarea class="cf-input" id="collabMsg" placeholder="Tell us about your idea — integration, research partnership, design partnership, or something else..."></textarea></div>
+        <button class="cf-btn" onclick="submitCollab()">Send Collaboration Request &rarr;</button>
+        <div class="cf-ok" id="collabOk">✅ Received! We'll reply within 48 hours.</div>
+      </div>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <!-- WORK WITH US -->
+    <div class="collab-section reveal" id="work">
+      <div class="section-label">Work with us</div>
+      <h2 class="sec-h2">Join the team.</h2>
+      <p class="sec-p" style="margin-bottom:18px;">We&rsquo;re a small, early team building in public from Bhubaneswar. If you care about developer tooling, security, and building things people actually use — we want to hear from you. Early team, meaningful equity, full ownership.</p>
+      <div class="role-grid">
+        <div class="role-card">
+          <div class="role-type eng">Engineering</div>
+          <div class="role-title">Full-stack Engineer</div>
+          <div class="role-desc">Node.js, PostgreSQL, React. Help build the platform layers — CI/CD integration, monitoring agents, team dashboard.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-type design">Design</div>
+          <div class="role-title">Product Designer</div>
+          <div class="role-desc">Own the entire product experience. Developer tools have terrible UX — help us make Grassion the exception.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-type eng">Engineering</div>
+          <div class="role-title">ML / AI Engineer</div>
+          <div class="role-desc">Train breach prediction models on our growing scan dataset. Help build the AI moat that makes Grassion defensible.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-type biz">Growth</div>
+          <div class="role-title">Developer Relations</div>
+          <div class="role-desc">Build community, create content, run workshops. Be the bridge between Grassion and 100K+ developers.</div>
+        </div>
+      </div>
+      <div class="collab-form">
+        <div class="cf-grid">
+          <div class="cf-row"><label class="cf-label">Your name</label><input type="text" class="cf-input" id="applyName" placeholder="Arjun Kumar"></div>
+          <div class="cf-row"><label class="cf-label">Email</label><input type="email" class="cf-input" id="applyEmail" placeholder="arjun@gmail.com"></div>
+        </div>
+        <div class="cf-row"><label class="cf-label">Role you're interested in</label>
+          <select class="cf-input" id="applyRole">
+            <option value="">Select a role...</option>
+            <option>Full-stack Engineer</option>
+            <option>Product Designer</option>
+            <option>ML / AI Engineer</option>
+            <option>Developer Relations</option>
+            <option>Other — I'll explain below</option>
+          </select>
+        </div>
+        <div class="cf-row"><label class="cf-label">Why Grassion? What do you bring?</label><textarea class="cf-input" id="applyMsg" placeholder="Tell us a bit about yourself and why you want to build at Grassion..."></textarea></div>
+        <div class="cf-row"><label class="cf-label">Portfolio / GitHub / LinkedIn (optional)</label><input type="text" class="cf-input" id="applyLink" placeholder="https://github.com/yourhandle"></div>
+        <button class="cf-btn" onclick="submitApply()">Send Application &rarr;</button>
+        <div class="cf-ok" id="applyOk">✅ Application received! We read every one. You'll hear from us within 72 hours.</div>
+      </div>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <!-- CONTACT US -->
+    <div class="reveal" id="contact-us" style="margin-bottom:52px;">
+      <div class="section-label">Contact us</div>
+      <h2 class="sec-h2">Say hello.</h2>
+      <p class="sec-p">Questions, ideas, press, or just want to chat about config security — reach us at <a href="mailto:info@grassion.com" style="color:var(--navy);font-weight:600;">info@grassion.com</a>. We respond within 24 hours.</p>
+      <div class="contact-band">
+        <div>
+          <p style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;">📧 info@grassion.com</p>
+          <p style="font-size:13px;color:var(--ink3);">For partnerships, press, general enquiries, and feedback.</p>
+        </div>
+        <a href="mailto:info@grassion.com" style="display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;padding:11px 22px;border-radius:9px;font-size:14px;font-weight:600;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 3px 10px rgba(42,46,110,0.2);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 22px rgba(42,46,110,0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 10px rgba(42,46,110,0.2)'">Send us an email →</a>
+      </div>
+    </div>
+
+    <div class="cta-strip reveal">
+      <h3>Ready to try Grassion?</h3>
+      <p>Free to start. 30 seconds to scan. Your .env data never leaves your browser.</p>
+      <a href="app.html">Try the Scanner &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="logo.png" alt="" onerror="this.style.display='none'">
+      <span>Grassion</span>
+    </div>
+    <p class="footer-copy">&copy; 2026 Grassion &middot; <a href="mailto:info@grassion.com" style="color:inherit">info@grassion.com</a> &middot; Your data never leaves your browser.</p>
+  </div>
+</footer>
+
+<script>
+// SCROLL REVEAL
+(function(){
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.07, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => obs.observe(el));
+})();
+
+con
+function submitCollab() {
+  const name = document.getElementById('collabName').value.trim();
+  const email = document.getElementById('collabEmail').value.trim();
+  const company = document.getElementById('collabCompany').value.trim();
+  const msg = document.getElementById('collabMsg').value.trim();
+  if (!email || !email.includes('@') || !msg) { alert('Please fill in email and message.'); return; }
+  try { fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, company, message: msg, source: 'collaborate_form'}) }); } catch(e) {}
+  document.getElementById('collabOk').style.display = 'block';
+  document.getElementById('collabName').value = '';
+  document.getElementById('collabEmail').value = '';
+  document.getElementById('collabCompany').value = '';
+  document.getElementById('collabMsg').value = '';
+}
+
+function submitApply() {
+  const name = document.getElementById('applyName').value.trim();
+  const email = document.getElementById('applyEmail').value.trim();
+  const role = document.getElementById('applyRole').value;
+  const msg = document.getElementById('applyMsg').value.trim();
+  const link = document.getElementById('applyLink').value.trim();
+  if (!email || !email.includes('@') || !msg) { alert('Please fill in email and message.'); return; }
+  try { fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, message: `Role: ${role}\n\n${msg}\n\nLink: ${link}`, source: 'work_form'}) }); } catch(e) {}
+  document.getElementById('applyOk').style.display = 'block';
+  document.getElementById('applyName').value = '';
+  document.getElementById('applyEmail').value = '';
+  document.getElementById('applyMsg').value = '';
+  document.getElementById('applyLink').value = '';
+}
+
+// Scroll reveal
+(function(){
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.07, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => obs.observe(el));
+})();
+s
