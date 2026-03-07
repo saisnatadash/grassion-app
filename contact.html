@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work With Us — Grassion</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root { --brand:#22bac4; --brand2:#2a2e6e; --brand-bg:rgba(34,186,196,0.08); }
+    body { background: var(--bg2); }
+
+    .g-blob { position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);opacity:0.04;animation:blobDrift 20s ease-in-out infinite; }
+    .g-blob-1 { width:480px;height:480px;background:#2a2e6e;top:-80px;left:-60px; }
+    .g-blob-2 { width:360px;height:360px;background:#22bac4;bottom:10%;right:-40px;animation-delay:-8s; }
+    @keyframes blobDrift { 0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(14px,-18px) scale(1.03)} }
+
+    .reveal { opacity:0;transform:translateY(24px);transition:opacity 0.5s ease,transform 0.5s ease; }
+    .reveal.visible { opacity:1;transform:translateY(0); }
+
+    .contact-wrap { padding-top:calc(var(--nav-h)+60px);min-height:100vh;position:relative;z-index:1; }
+    .contact-main { max-width:820px;margin:0 auto;padding:0 32px 100px; }
+
+    .contact-hero { margin-bottom:52px; }
+    .contact-hero h1 { font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.1;margin-bottom:16px; }
+    .contact-hero h1 span { color:var(--brand); }
+    .contact-hero p { font-size:17px;color:var(--ink2);font-weight:300;line-height:1.7; }
+
+    .divider { width:48px;height:3px;background:var(--brand);border-radius:2px;margin:36px 0; }
+
+    /* Opportunity cards */
+    .opp-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px; }
+    @media(max-width:600px){ .opp-grid{grid-template-columns:1fr;} }
+    .opp-card {
+      background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;
+      cursor:pointer;transition:box-shadow 0.25s,transform 0.25s,border-color 0.2s;
+    }
+    .opp-card:hover { box-shadow:0 8px 28px rgba(34,186,196,0.1);transform:translateY(-2px);border-color:var(--brand); }
+    .opp-tag { display:inline-block;background:var(--brand-bg);color:var(--brand);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em; }
+    .opp-title { font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px; }
+    .opp-desc { font-size:13px;color:var(--ink2);line-height:1.6;font-weight:300; }
+
+    /* Contact form */
+    .contact-form { background:#fff;border:1px solid var(--border);border-radius:16px;padding:36px; }
+    .form-row { margin-bottom:20px; }
+    .form-label { display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:7px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em; }
+    .form-input {
+      width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:8px;
+      font-size:14px;font-family:var(--font-body);color:var(--ink);
+      box-sizing:border-box;outline:none;background:#fff;
+      transition:border-color 0.2s,box-shadow 0.2s;
+    }
+    .form-input:focus { border-color:var(--brand);box-shadow:0 0 0 3px rgba(34,186,196,0.1); }
+    textarea.form-input { resize:vertical;min-height:120px; }
+    select.form-input { cursor:pointer; }
+
+    .form-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+    @media(max-width:600px){ .form-grid{grid-template-columns:1fr;} }
+
+    .submit-btn {
+      width:100%;padding:14px;background:var(--brand2);color:#fff;border:none;border-radius:8px;
+      font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-body);
+      transition:background 0.2s,transform 0.2s,box-shadow 0.2s;
+      margin-top:8px;
+    }
+    .submit-btn:hover { background:var(--brand);transform:translateY(-1px);box-shadow:0 6px 20px rgba(34,186,196,0.25); }
+    .submit-btn:disabled { opacity:0.6;cursor:default;transform:none; }
+
+    .success-msg { display:none;text-align:center;padding:32px;color:var(--brand);font-size:16px;font-weight:600; }
+
+    /* Direct contact */
+    .direct-links { display:flex;gap:16px;flex-wrap:wrap;margin-top:40px; }
+    .direct-link {
+      display:flex;align-items:center;gap:10px;
+      background:#fff;border:1px solid var(--border);border-radius:10px;
+      padding:14px 20px;text-decoration:none;color:var(--ink);
+      font-size:14px;font-weight:500;
+      transition:box-shadow 0.2s,transform 0.2s,border-color 0.2s;
+    }
+    .direct-link:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08);transform:translateY(-1px);border-color:var(--brand);color:var(--brand); }
+    .direct-link span { font-size:18px; }
+  </style>
+</head>
+<body>
+
+<div class="g-blob g-blob-1"></div>
+<div class="g-blob g-blob-2"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Grassion" style="height:26px;width:auto;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'">
+      <span class="dot-live"></span>Grassion
+    </a>
+    <div class="nav-links" style="display:flex;align-items:center;gap:12px;">
+      <a href="about.html" class="btn btn-ghost" style="font-size:13px;">About</a>
+      <a href="contact.html" class="btn btn-ghost" style="font-size:13px;color:var(--brand);">Work with us</a>
+      <a href="app.html" class="btn btn-primary" style="font-size:13px;padding:8px 18px;">Try Scanner →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="contact-wrap">
+  <div class="contact-main">
+
+    <div class="contact-hero reveal">
+      <h1>Let's build something<br><span>important</span> together.</h1>
+      <p>We're early stage, moving fast, and looking for people who see the same opportunity we do — making Indian developer infrastructure safer, smarter, and compliant.</p>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <div class="opp-grid reveal">
+      <div class="opp-card" onclick="selectType('engineering')">
+        <div class="opp-tag">Engineering</div>
+        <div class="opp-title">Senior Full-Stack / Security Engineer</div>
+        <div class="opp-desc">Build the CI/CD integration layer, AI risk engine, and runtime monitoring agent. Node.js, PostgreSQL, ML pipelines.</div>
+      </div>
+      <div class="opp-card" onclick="selectType('ml')">
+        <div class="opp-tag">AI / ML</div>
+        <div class="opp-title">ML Engineer — Breach Predictor</div>
+        <div class="opp-desc">Train our proprietary breach prediction model on the world's largest real-world config vulnerability dataset.</div>
+      </div>
+      <div class="opp-card" onclick="selectType('devrel')">
+        <div class="opp-tag">DevRel</div>
+        <div class="opp-title">Developer Relations Lead</div>
+        <div class="opp-desc">Own developer community, conference circuit, content. You know the Indian dev ecosystem. You're known in it.</div>
+      </div>
+      <div class="opp-card" onclick="selectType('enterprise')">
+        <div class="opp-tag">Enterprise</div>
+        <div class="opp-title">Enterprise Sales / Partnerships</div>
+        <div class="opp-desc">Land DPDP compliance contracts with India's top 500 tech companies. Own the relationship from first call to signed contract.</div>
+      </div>
+      <div class="opp-card" onclick="selectType('invest')">
+        <div class="opp-tag">Investor</div>
+        <div class="opp-title">Pre-Seed Investor / Advisor</div>
+        <div class="opp-desc">We're raising ₹80L at ₹4.4Cr pre-money. Developer security, DPDP compliance, India-first. Strong early traction.</div>
+      </div>
+      <div class="opp-card" onclick="selectType('partner')">
+        <div class="opp-tag">Partner</div>
+        <div class="opp-title">Integration / Channel Partner</div>
+        <div class="opp-desc">CA firms, audit consultants, DevOps tooling companies. Add config intelligence to your offering.</div>
+      </div>
+    </div>
+
+    <div class="contact-form reveal">
+      <div id="formContent">
+        <p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:24px;">Tell us about yourself</p>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label">Your name *</label>
+            <input id="cName" type="text" class="form-input" placeholder="Arjun Sharma">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Email *</label>
+            <input id="cEmail" type="email" class="form-input" placeholder="arjun@company.com">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label">Company / Organisation</label>
+            <input id="cCompany" type="text" class="form-input" placeholder="Startup / Enterprise / Independent">
+          </div>
+          <div class="form-row">
+            <label class="form-label">I'm interested in *</label>
+            <select id="cType" class="form-input">
+              <option value="">Select one...</option>
+              <option value="engineering">Engineering role</option>
+              <option value="ml">AI/ML role</option>
+              <option value="devrel">DevRel role</option>
+              <option value="enterprise">Enterprise sales role</option>
+              <option value="invest">Investing / Advising</option>
+              <option value="partner">Partnership</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Message *</label>
+          <textarea id="cMessage" class="form-input" placeholder="Tell us what you're working on, why Grassion interests you, or what you'd want to explore together..."></textarea>
+        </div>
+        <button class="submit-btn" onclick="submitContact()" id="submitBtn">Send Message →</button>
+      </div>
+      <div class="success-msg" id="successMsg">
+        ✓ Message received! We read every one and reply within 48 hours.<br>
+        <span style="font-size:14px;font-weight:400;color:var(--ink2);">While you wait — try the scanner at grassion.com/app.html</span>
+      </div>
+    </div>
+
+    <div class="divider reveal"></div>
+
+    <div class="reveal">
+      <p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:16px;">Or reach us directly</p>
+      <div class="direct-links">
+        <a href="/cdn-cgi/l/email-protection#5724363e1730253624243e38397934383a" class="direct-link"><span>✉️</span> <span class="__cf_email__" data-cfemail="c3b0a2aa83a4b1a2b0b0aaacadeda0acae">[email&#160;protected]</span></a>
+        <a href="https://twitter.com/grassion_dev" target="_blank" class="direct-link"><span>𝕏</span> @grassion_dev</a>
+        <a href="https://linkedin.com/company/grassion" target="_blank" class="direct-link"><span>💼</span> LinkedIn</a>
+        <a href="app.html" class="direct-link"><span>🔍</span> Try the scanner</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Grassion</div>
+      <p class="footer-note">© 2026 Grassion · <a href="mailto:info@grassion.com" style="color:inherit;text-decoration:underline;">info@grassion.com</a> · Your data never leaves your browser.</p>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function selectType(val) {
+    document.getElementById('cType').value = val;
+    document.getElementById('cMessage').focus();
+  }
+
+  async function submitContact() {
+    const name    = document.getElementById('cName').value.trim();
+    const email   = document.getElementById('cEmail').value.trim();
+    const company = document.getElementById('cCompany').value.trim();
+    const type    = document.getElementById('cType').value;
+    const message = document.getElementById('cMessage').value.trim();
+
+    if (!name || !email || !email.includes('@') || !message) {
+      alert('Please fill in your name, email, and message.');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.textContent = 'Sending...';
+
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: localStorage.getItem('grassion_session') || 'contact_page',
+          user_email: email,
+          category: type || 'contact',
+          message: `[${type?.toUpperCase()||'CONTACT'}] ${name} (${company||'—'}): ${message}`,
+          feature_request: null,
+          sentiment: 'positive',
+          plan: 'free',
+          page: 'contact'
+        })
+      });
+    } catch(e) {}
+
+    // Show success regardless (graceful offline fallback)
+    document.getElementById('formContent').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entrie
